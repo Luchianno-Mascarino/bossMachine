@@ -98,7 +98,10 @@ app.get('/api/ideas', (req, res, next) => {
 
 app.post('/api/ideas', (req, res, next) => {
     const ideasData = req.body;
-    
+    //String to int to be added to the DB correctly
+    ideasData.numWeeks = parseInt(ideasData.numWeeks)
+    ideasData.weeklyRevenue = parseInt(ideasData.weeklyRevenue)
+
     const newIdea = addToDatabase('ideas', ideasData);
 
     if(!newIdea){
@@ -126,6 +129,9 @@ app.put('/api/ideas/:ideaId', (req, res, next) => {
     const ideaUpdate = req.body;
     const ideaId = req.params.ideaId;
     
+    //Pasamos los datos de string a INT para que se guarden correctamente en la
+    ideaUpdate.numWeeks = parseInt(ideaUpdate.numWeeks);
+    ideaUpdate.weeklyRevenue = parseInt(ideaUpdate.weeklyRevenue);
 
     const ideaUpdated = updateInstanceInDatabase('ideas', {...ideaUpdate, id: ideaId})
 
