@@ -234,7 +234,7 @@ const updateInstanceInDatabase = (modelType, instance) => {
     model.data[instanceIndex] = instance;
     return model.data[instanceIndex];
   } else {
-    return null;
+    return null;  
   }
 }
 
