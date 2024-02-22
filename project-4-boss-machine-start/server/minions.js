@@ -4,7 +4,7 @@ module.exports = minionsRouter;
 
 //app.use(bodyParser.json())
 
-import {
+const {
   createMeeting,
   getAllFromDatabase,
   getFromDatabaseById,
@@ -12,7 +12,7 @@ import {
   updateInstanceInDatabase,
   deleteFromDatabasebyId,
   deleteAllFromDatabase,
-  } from './db.js';
+  } = require('./db.js');
 
 //MIDDLEWARE
 
@@ -86,4 +86,11 @@ minionsRouter.delete('/:minionId', (req, res, next) => {
         res.status(204)
     }
     res.send();
+})
+
+
+//WORK ROUTES
+
+minionsRouter.get('/:minionId/work', (req, res, next) => {
+
 })

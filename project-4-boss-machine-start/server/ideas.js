@@ -11,6 +11,19 @@ const {
   } = require('./db');
 
 
+const checkMillionDollarIdea = require('./checkMillionDollarIdea');
+
+ideasRouter.param('ideasId', (req, res, next, id) => {
+    const idea = getFromDatabaseById('ideas', id);
+    if(idea){
+        req.ideasId = idea;
+        next();
+    } else {
+        res.status(404).send();
+    }
+})
+
+
 ideasRouter.get('/', (req, res, next) => {
     const ideas = getAllFromDatabase('ideas')
 
@@ -23,7 +36,7 @@ ideasRouter.get('/', (req, res, next) => {
 
 //POST IDEAS
 
-ideasRouter.post('/', (req, res, next) => {
+ideasRouter.post('/', checkMillionDollarIdea, (req, res, next) => {
     const ideasData = req.body;
     //String to int to be added to the DB correctly
     ideasData.numWeeks = parseInt(ideasData.numWeeks)
@@ -32,41 +45,41 @@ ideasRouter.post('/', (req, res, next) => {
     const newIdea = addToDatabase('ideas', ideasData);
 
     if(!newIdea){
-        return res.status(500).json({error : 'No se pudo agregar'})
+        return res.status(500)
     }
-    res.status(201).json(newIdea)
+    res.status(201).send(newIdea)
 })
 
 //get single ID
 
 ideasRouter.get('/:ideald', (req, res, next) => {
-    const ideaData = req.params.ideaId
-    const ideaId = getFromDatabaseById('ideas', ideaData)
+    const ideaId = req.ideaId
+ 
 
     if (!ideaId) {
         return res.status(404).json({error: 'Not found'})
     }
-    res.json(ideaId)
+    res.send(ideaId)
 
 })
 
 //PUT Idea
 
-ideasRouter.put('/:ideaId', (req, res, next) => {
+ideasRouter.put('/:ideaId', checkMillionDollarIdea, (req, res, next) => {
     const ideaUpdate = req.body;
-    const ideaId = req.params.ideaId;
+    
     
     //Pasamos los datos de string a INT para que se guarden correctamente en la
-    ideaUpdate.numWeeks = parseInt(ideaUpdate.numWeeks);
-    ideaUpdate.weeklyRevenue = parseInt(ideaUpdate.weeklyRevenue);
+    //ideaUpdate.numWeeks = parseInt(ideaUpdate.numWeeks);
+    //ideaUpdate.weeklyRevenue = parseInt(ideaUpdate.weeklyRevenue);
 
-    const ideaUpdated = updateInstanceInDatabase('ideas', {...ideaUpdate, id: ideaId})
+    const ideaUpdated = updateInstanceInDatabase('ideas', ideaUpdate)
 
     if(!ideaUpdated){
-        return res.status(404).json({error: 'Error'})
+        return res.status(404)
     }
 
-    res.json(ideaUpdated)
+    res.send(ideaUpdated)
 })
 
 //DELETE IDEA
@@ -77,7 +90,7 @@ ideasRouter.delete('/:ideaId', (req, res, next) =>{
     const ideaDeleted = deleteFromDatabasebyId('ideas', ideaId);
 
     if(!ideaDeleted){
-        return res.status(404).json({error: 'Not found'})
+        return res.status(500)
     }
 
     res.status(204).send()

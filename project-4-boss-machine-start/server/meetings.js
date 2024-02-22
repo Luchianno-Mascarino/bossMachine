@@ -3,11 +3,7 @@ const meetingsRouter = require('express').Router();
 module.exports = meetingsRouter;
 
 const { 
-    addToDatabase,
-    getAllFromDatabase,
-    getFromDatabaseById,
-    updateInstanceInDatabase,
-    deleteFromDatabasebyId,
+    getAllFromDatabase, addToDatabase, deleteAllFromDatabase, createMeeting
   } = require('./db');
 
 
@@ -17,7 +13,7 @@ meetingsRouter.get('/', (req, res, next) => {
     const allMeetings = getAllFromDatabase('meetings');
 
     if(!allMeetings) {
-        res.status(404).json({error: 'not found'})
+        res.status(404)
     }
 
     res.send(allMeetings)
@@ -27,13 +23,13 @@ meetingsRouter.get('/', (req, res, next) => {
 
 meetingsRouter.post('/', (req, res, next) => {
     
-    const meetingsAdd = createMeeting()
+    const meetingsAdd = addToDatabase('meetings',createMeeting());
 
     if(!meetingsAdd){
-        res.status(500).json({error: 'Cannot add'})
+        res.status(500)
     }
 
-    res.status(201).json(meetingsAdd)
+    res.status(201).send(meetingsAdd)
 })
 
 //DELETE MEETINGS
@@ -42,7 +38,7 @@ meetingsRouter.delete('/', (req, res, next) => {
     const deletedMeetings = deleteAllFromDatabase('meetings');
 
     if(!deletedMeetings){
-        res.status(404).json({error: 'Not found'})
+        res.status(404)
     }
 
     res.send(deletedMeetings);
