@@ -14,6 +14,18 @@ import {
   deleteAllFromDatabase,
   } from './db.js';
 
+//MIDDLEWARE
+
+minionsRouter.param('minionId', (req, res, next, id) => {
+    const minion = getFromDatabaseById('minions', id);
+    if(minion) {
+        req.minion = minion;
+        next();
+    }else {
+        res.status(404).send();
+    }
+})
+
 
 //GET ALL minions
 minionsRouter.get('/', (req, res, next) =>{
@@ -37,8 +49,8 @@ minionsRouter.post('/', (req, res, next) => {
 // GET un solo minion
 
 minionsRouter.get('/:minionId', (req, res, next) => {
-    const minionId = req.params.minionId
-    const minion = getFromDatabaseById('minions', minionId)
+    //const minionId = req.params.minionId
+    const minion = req.minion
 
     if(!minion){
         return res.status(404).json({error: 'Minion not found'})
@@ -48,28 +60,30 @@ minionsRouter.get('/:minionId', (req, res, next) => {
 
 //PUT Minions
 
-minionsRouter.put('/:minionsId', (req, res, next) => {
-    const minionId = req.params.minionId
+minionsRouter.put('/:minionId', (req, res, next) => {
+    
 
     const minionUpdated = req.body;
 
-    const updatedInstance = updateInstanceInDatabase('minions', {...minionUpdated, id: minionId})
+    const updatedInstance = updateInstanceInDatabase('minions', minionUpdated)
 
     if (!updatedInstance){
         return res.status(404).json({error: 'Minion not found'})
     }
 
-    res.json(updatedInstance)
+    res.send(updatedInstance)
 })
 
 //MINION DELETE
-minionsRouter.delete('/:minionsId', (req, res, next) => {
+minionsRouter.delete('/:minionId', (req, res, next) => {
     const minionId = req.params.minionId
 
     const minionDeleted = deleteFromDatabasebyId('minions', minionId);
 
     if(!minionDeleted) {
-        return res.status(404).json({error: 'Minion not found'})
+        return res.status(500)
+    } else {
+        res.status(204)
     }
-    res.status(204).send();
+    res.send();
 })
